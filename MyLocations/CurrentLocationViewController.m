@@ -119,21 +119,22 @@
     }
 }
 
+- (void)startLocationManager
+{
+    if ([CLLocationManager locationServicesEnabled]) {
+        locationManager.delegate = self;
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        [locationManager startUpdatingLocation];
+        updatingLocation = YES;
+    }
+}
+
 - (void)stopLocationManager
 {
     if (updatingLocation) {
         [locationManager stopUpdatingLocation];
         locationManager.delegate = nil;
         updatingLocation = NO;
-    }
-}
-
-- (void)startLocationManager
-{
-    if ([CLLocationManager locationServicesEnabled]) {
-        locationManager.delegate = self;
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        updatingLocation = YES;
     }
 }
 
