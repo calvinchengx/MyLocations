@@ -6,8 +6,10 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
+// import done in .pch file already :-) No need to leave this here
+// #import <UIKit/UIKit.h>
+// #import <CoreLocation/CoreLocation.h>
+#import "LocationDetailsViewController.h"
 
 @interface CurrentLocationViewController : UIViewController <CLLocationManagerDelegate>
 

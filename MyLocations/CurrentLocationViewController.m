@@ -52,13 +52,13 @@
 
 - (void)viewDidUnload
 {
+    [self setMessageLabel:nil];
+    [self setLongitudeLabel:nil];
+    [self setLatitudeLabel:nil];
+    [self setAddressLabel:nil];
+    [self setGetButton:nil];
+    [self setTagButton:nil];
     [super viewDidUnload];
-    self.messageLabel = nil;
-    self.latitudeLabel = nil;
-    self.longitudeLabel = nil;
-    self.addressLabel = nil;
-    self.tagButton = nil;
-    self.getButton = nil;
 }
 
 - (IBAction)getLocation:(id)sender
@@ -114,6 +114,11 @@
         return;
     }
     
+    CLLocationDistance distance = MAXFLOAT;
+    if (location != nil) {
+        distance = [newLocation distanceFromLocation:location];
+    }
+    
     if (location == nil || location.horizontalAccuracy > newLocation.horizontalAccuracy) {
         
         lastLocationError = nil;
@@ -124,6 +129,10 @@
             NSLog(@"*** we're done!");
             [self stopLocationManager];
             [self configureGetButton];
+            
+            if (distance > 0) {
+                performReverseGeocoding = NO;
+            }
         }
         
         if (!performReverseGeocoding) {
@@ -149,10 +158,10 @@
 
 - (NSString *)stringFromPlacemark:(CLPlacemark *)thePlacemark
 {
-    return [NSString stringWithFormat:@"%@ %@\n%@ %@ %@",
+    return [NSString stringWithFormat:@"%@ %@ %@\n%@ %@ %@",
             thePlacemark.subThoroughfare, thePlacemark.thoroughfare,
             thePlacemark.locality, thePlacemark.administrativeArea,
-            thePlacemark.postalCode];
+            thePlacemark.postalCode, thePlacemark.country];
 }
 
 - (void)updateLabels
@@ -216,6 +225,21 @@
         locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
         [locationManager startUpdatingLocation];
         updatingLocation = YES;
+        
+        [self performSelector:@selector(didTimeOut:) withObject:nil afterDelay:60];
+    }
+}
+
+- (void)didTimeOut:(id)obj
+{
+    NSLog(@"*** Time out");
+    
+    if (location == nil) {
+        [self stopLocationManager];
+        
+        lastLocationError = [NSError errorWithDomain:@"MyLocationsErrorDomain" code:1 userInfo:nil];
+        [self updateLabels];
+        [self configureGetButton];
     }
 }
 
@@ -225,6 +249,16 @@
         [locationManager stopUpdatingLocation];
         locationManager.delegate = nil;
         updatingLocation = NO;
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"TagLocation"]){
+        UINavigationController *navigationController = segue.destinationViewController;
+        LocationDetailsViewController *controller = (LocationDetailsViewController *)navigationController.topViewController;
+        controller.coordinate = location.coordinate;
+        controller.placemark = placemark;
     }
 }
 
