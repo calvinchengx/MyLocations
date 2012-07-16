@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface LocationDetailsViewController : UITableViewController <CLLocationManagerDelegate>
+@interface LocationDetailsViewController : UITableViewController <CLLocationManagerDelegate, UITextViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UITextView *descriptionTextView;
 @property (strong, nonatomic) IBOutlet UILabel *categoryLabel;

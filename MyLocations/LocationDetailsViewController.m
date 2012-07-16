@@ -12,7 +12,10 @@
 
 @end
 
-@implementation LocationDetailsViewController
+@implementation LocationDetailsViewController {
+    NSString *descriptionText;
+}
+
 @synthesize descriptionTextView;
 @synthesize categoryLabel;
 @synthesize latitudeLabel;
@@ -21,6 +24,14 @@
 @synthesize dateLabel;
 @synthesize placemark;
 @synthesize coordinate;
+
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    if ((self = [super initWithCoder:aDecoder])) {
+        descriptionText = @"";
+    }
+    return self;
+}
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -61,7 +72,7 @@
 {
     [super viewDidLoad];
     
-    self.descriptionTextView.text = @"";
+    self.descriptionTextView.text = descriptionText;
     self.categoryLabel.text = @"";
     self.latitudeLabel.text = [NSString stringWithFormat:@"%.8f", self.coordinate.latitude];
     self.longitudeLabel.text = [NSString stringWithFormat:@"%.8f", self.coordinate.longitude];
@@ -98,6 +109,7 @@
 
 - (IBAction)done:(id)sender 
 {
+    NSLog(@"Description '%@'", descriptionText);
     [self closeScreen];
 }
 
@@ -126,5 +138,18 @@
         return 44;
     }
 }
-    
+
+#pragma mark - UITextViewDelegate
+
+- (BOOL)textView:(UITextView *)theTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text 
+{
+    descriptionText = [theTextView.text stringByReplacingCharactersInRange:range withString:text];
+    return YES;
+}
+
+- (void)textViewDidEndEditing:(UITextView *)theTextView
+{
+    descriptionText = theTextView.text;
+}
+
 @end
